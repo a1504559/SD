@@ -1,0 +1,18 @@
+body { font-family:helvetica neue,helvetica,arial,sans-serif,Georgia,serif; color:#333; margin:0; }
+a, a:visited { text-decoration:none; color:#0066CC; }
+.navi { font-family:arial,sans-serif;  font-size:80%; }
+.navi a, .navi span { margin-right:7px; }
+.navi .sel { font-weight:bold; }
+.navi { text-align:center; }
+h1 {display:inline-block;margin-bottom:10;}
+h2 { font-size:1em; margin:25px 0 0; border-bottom:1px dotted #ccc; padding-bottom:3px; font-family:arial,sans-serif;text-transform:uppercase; }
+h3 { font-size:1em; }
+.qs { width:75%; font-size:14px; padding:5px; }
+.cite, .footer, .cite2 { color:#666; font-size:0.8em; font-family:arial,sans-serif; }
+.light { color:#666; }
+.footer { text-align:center; }
+.quotes b { background:#FEF0AD; padding:2px; }
+ol { margin-left:0;padding-left:20px; }
+.sb {text-align:center;}
+#main {padding:0 10px 10px 10px;}
+form {margin:0;}
