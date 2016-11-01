@@ -29,21 +29,22 @@ public class WebController {
 
 	Logger log = LoggerFactory.getLogger(this.getClass());
 	
-    @RequestMapping(value="/start", method=RequestMethod.GET)
-    public String customerForm(Model model) {
+    @RequestMapping(value={"/start"}, method=RequestMethod.GET)
+    public String startGet(Model model) {
     	log.info("--------------method GET");
     	
+    	//stub for first starting
     	Record myRecord = new Record();
-    	myRecord.setWord("Enter here a word in English...");
+    	myRecord.setWord("");
     	myRecord.setDirection("En-Fi");
-    	myRecord.setContent("... and will get the translation here");
+    	myRecord.setContent("");
     	
         model.addAttribute("record", myRecord);
         return "start";
     }
     
-    @RequestMapping(value="/start", method=RequestMethod.POST)
-    public String customerSubmit(@ModelAttribute Record myRecord, Model model) {
+    @RequestMapping(value={"/start"}, method=RequestMethod.POST)
+    public String startPost(@ModelAttribute Record myRecord, Model model) {
     	log.info("--------------method POST");
     	//log.info(myRecord.getWord());
     	//log.info("00000000000000" + myRecord.getDirection());
@@ -57,6 +58,16 @@ public class WebController {
         
         return "start";
     }
+
+    @RequestMapping(value="/login")
+	public String login() {
+		return "login";
+	}
+    
+    @RequestMapping(value="/add")
+	public String add() {
+		return "add";
+	} 
     
 	private static SessionFactory sessionFactory = null;  
 	private static ServiceRegistry serviceRegistry = null; 
