@@ -1,5 +1,6 @@
 package fi.haagahelia.bzot.web;
 
+import java.io.Console;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,9 +31,30 @@ public class WebController {
 	
     @RequestMapping(value="/start", method=RequestMethod.GET)
     public String customerForm(Model model) {
+    	log.info("--------------method GET");
+    	
     	Record myRecord = new Record();
-    	myRecord.setContent("");
+    	myRecord.setWord("Enter here a word in English...");
+    	myRecord.setDirection("En-Fi");
+    	myRecord.setContent("... and will get the translation here");
+    	
         model.addAttribute("record", myRecord);
+        return "start";
+    }
+    
+    @RequestMapping(value="/start", method=RequestMethod.POST)
+    public String customerSubmit(@ModelAttribute Record myRecord, Model model) {
+    	log.info("--------------method POST");
+    	//log.info(myRecord.getWord());
+    	//log.info("00000000000000" + myRecord.getDirection());
+    	
+    	
+    	myRecord.setContent(translationRetrieving(myRecord.getWord(), myRecord.getDirection()));
+        model.addAttribute("record", myRecord);       
+        
+        String info = String.format("%s record retrieved: question = %s, answer = %s", myRecord.getDirection(), myRecord.getWord(), myRecord.getContent());
+        log.info(info);
+        
         return "start";
     }
     
@@ -40,11 +62,27 @@ public class WebController {
 	private static ServiceRegistry serviceRegistry = null; 
 	private String s = "";
 	  
-	private static SessionFactory configureSessionFactory() throws HibernateException {  
+	private static SessionFactory configureSessionFactory(String direction) throws HibernateException {  
 	    Configuration configuration = new Configuration();  
-	    configuration.configure();  
+	    configuration.configure();
 	    
 	    Properties properties = configuration.getProperties();
+	    
+	    //System.out.print("BEFORE --> " + configuration.getProperty("hibernate.connection.url") + '\r');
+	    //System.out.print("2222!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + direction);
+	    
+	    if (direction.equals("Fi-En")) {
+	    	//System.out.print("CASE Fi-En\r");	
+	    	configuration.setProperty("hibernate.connection.url","jdbc:sqlite:fien.db");
+	    }
+	    else {
+	    	//System.out.print("CASE En-Fi\r");	
+	    	configuration.setProperty("hibernate.connection.url","jdbc:sqlite:enfi.db");
+	    }
+	    
+	    //System.out.print("3333" + configuration.getProperties());
+	    //System.out.print("AFTER --> " + configuration.getProperty("hibernate.connection.url") + '\r');
+
 	    
 		serviceRegistry = new ServiceRegistryBuilder().applySettings(properties).buildServiceRegistry();          
 	    sessionFactory = configuration.buildSessionFactory(serviceRegistry);  
@@ -52,10 +90,10 @@ public class WebController {
 	    return sessionFactory;  
 	}
 	
-	public String translationRetrieving(String word)
+	public String translationRetrieving(String word, String direction)
 	{
 		// Configure the session factory
-		configureSessionFactory();
+		configureSessionFactory(direction);
 		
 		Session session = null;
 		Transaction tx=null;
@@ -88,16 +126,4 @@ public class WebController {
 		}
 		return s;
 	}
-
-    @RequestMapping(value="/start", method=RequestMethod.POST)
-    public String customerSubmit(@ModelAttribute Record myRecord, Model model) {
-    	myRecord.setContent(translationRetrieving(myRecord.getWord()));
-        model.addAttribute("record", myRecord);       
-        
-        String info = String.format("Record retrieved: question = %s, answer = %s", myRecord.getWord(), myRecord.getContent());
-        log.info(info);
-        
-        return "start";
-    }
-
 }

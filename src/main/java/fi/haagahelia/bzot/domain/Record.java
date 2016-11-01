@@ -13,15 +13,17 @@ public class Record {
 	private Integer id;
 	private String word;
 	private String content;
-
+	private String direction;
+	
 	public Record() {
 
 	}
 
-	public Record(Integer id, String word, String content) {
+	public Record(Integer id, String word, String content, String direction) {
 		this.id = id;
 		this.word = word;
 		this.content = content;
+		this.direction = direction;
 	}
 
 	@Id
@@ -47,5 +49,13 @@ public class Record {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
 	}
 }

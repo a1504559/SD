@@ -1,26 +1,43 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 	<head>
-    <title>Translator</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link type="text/css" rel="stylesheet" href="css/style.css" th:href="@{css/style.css}" />
+    	<title>Translator</title>
+    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    	<link type="text/css" rel="stylesheet" href="css/style.css" th:href="@{css/style.css}" />
 	</head>
-	<body>
+	<body> 
 		<div class="col-md-4">
 		<h1></h1>
 		</div>
 		<div class="headercont">
 			<div class="header">
-				<form action="#" th:action="@{/start}" th:object="${record}" method="post">
+				<form action="#" th:action="@{/start}" th:object="${record}" method="post" id="myForm">
 					<div class="logo">
 					</div>
 					<div class="sb">
-						<input type="text" th:field="*{word}" name="search" class="qs" value="" />
-						<input type="submit" class="submit" value="Submit" /> <input type="reset" value="Reset" size="30" />
+						<input type="text" th:field="*{word}" name="search" id="search" class="qs" value="" />
+						<input type="submit" value="Submit" id="btnsubmit"/>
+						<input th:onclick="'javascript:changeX(this);'" th:field="*{direction}" type="button" th:value="*{direction}" size="30" id="direction2" name="direction2"></input>
+						<input type="hidden" th:field="*{direction}" name="direction" id="direction" class="qs2" th:value="*{direction}" width="1"/>
 					</div>
-					<div th:remove="tag" th:utext="${record.content}"></div>
+					<div class="header">
+						<div class="sb" th:remove="tag" th:utext="${record.content}"></div>
+					</div>
 				</form>
 			</div>
-		</div>  
+		</div>
+		<script type="text/javascript">		
+			function changeX(el) {
+				console.log("--------------changing of the direction");
+			    if (el.value == "En-Fi") {
+			    	el.value = "Fi-En";
+			    	document.getElementById("direction").value = "Fi-En";
+			    }
+			    else {
+			    	el.value = "En-Fi";
+			    	document.getElementById("direction").value = "En-Fi";
+			    }
+			}
+		</script> 
 	</body>
 </html>
