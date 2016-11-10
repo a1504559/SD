@@ -3,12 +3,12 @@
 	<head>
     	<title>Translator</title>
     	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    	<link type="text/css" rel="stylesheet" href="css/style.css" th:href="@{css/style.css}" />
+    	 <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" />
 	</head>
 	<body>
 		<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
         <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Sign Out"/>
+            <input type="submit" value="Sign Out" class="btn btn-danger"/>
         </form>
         
 	<div th:if="${#httpServletRequest.isUserInRole('ADMIN')}" >          
@@ -25,8 +25,8 @@
 					</div>
 					<div class="sb">
 						<input type="text" th:field="*{word}" name="search" id="search" class="qs" value="" />
-						<input type="submit" value="Submit" id="btnsubmit"/>
-						<input th:onclick="'javascript:changeX(this);'" th:field="*{direction}" type="button" th:value="*{direction}" size="30" id="direction2" name="direction2"></input>
+						<input type="submit" value="Submit" id="btnsubmit" class="btn btn-danger"/>
+						<input class="btn btn-danger" th:onclick="'javascript:changeX(this);'" th:field="*{direction}" type="button" th:value="*{direction}" size="30" id="direction2" name="direction2"></input>
 						<input type="hidden" th:field="*{direction}" name="direction" id="direction" class="qs2" th:value="*{direction}" width="1"/>
 					</div>
 					<div class="header">

@@ -1,6 +1,7 @@
 package fi.haagahelia.bzot.web;
 
 import java.io.Console;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
@@ -15,22 +16,26 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import fi.haagahelia.bzot.domain.Record;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 @EnableAutoConfiguration
 @Controller
-public class WebController {
-
+public class WebController {				
+	List<String> directions = new ArrayList<String>(Arrays.asList(new String[]{"En-Fi", "Fi-En"}));
+	
 	Logger log = LoggerFactory.getLogger(this.getClass());
 	
     @RequestMapping(value={"/start"}, method=RequestMethod.GET)
-    public String startGet(Model model) {
+    public String _startGet(Model model) {
     	log.info("--------------method GET");
     	
     	//stub for first starting
@@ -39,16 +44,13 @@ public class WebController {
     	myRecord.setDirection("En-Fi");
     	myRecord.setContent("");
     	
-        model.addAttribute("record", myRecord);
+        model.addAttribute("record", myRecord);   	
         return "start";
     }
     
     @RequestMapping(value={"/start"}, method=RequestMethod.POST)
-    public String startPost(@ModelAttribute Record myRecord, Model model) {
-    	log.info("--------------method POST");
-    	//log.info(myRecord.getWord());
-    	//log.info("00000000000000" + myRecord.getDirection());
-    	
+    public String _startPost(@ModelAttribute Record myRecord, Model model) {
+    	log.info("--------------method POST");	
     	
     	myRecord.setContent(translationRetrieving(myRecord.getWord(), myRecord.getDirection()));
         model.addAttribute("record", myRecord);       
@@ -60,14 +62,24 @@ public class WebController {
     }
 
     @RequestMapping(value="/login")
-	public String login() {
+	public String _login() {
 		return "login";
 	}
     
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value="/add")
-	public String add() {
-		return "add";
-	} 
+	public String _add(Model model) {
+    	model.addAttribute("record", new Record());
+    	model.addAttribute("directions", directions);
+		return "addcontent";
+	}
+    
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    public String _save(Record record){
+    	translationSaving(record.getWord(), record.getContent(), record.getDirection());
+
+    	return "redirect:start";
+    }    
     
 	private static SessionFactory sessionFactory = null;  
 	private static ServiceRegistry serviceRegistry = null; 
@@ -79,9 +91,6 @@ public class WebController {
 	    
 	    Properties properties = configuration.getProperties();
 	    
-	    //System.out.print("BEFORE --> " + configuration.getProperty("hibernate.connection.url") + '\r');
-	    //System.out.print("2222!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + direction);
-	    
 	    if (direction.equals("Fi-En")) {
 	    	//System.out.print("CASE Fi-En\r");	
 	    	configuration.setProperty("hibernate.connection.url","jdbc:sqlite:fien.db");
@@ -90,10 +99,6 @@ public class WebController {
 	    	//System.out.print("CASE En-Fi\r");	
 	    	configuration.setProperty("hibernate.connection.url","jdbc:sqlite:enfi.db");
 	    }
-	    
-	    //System.out.print("3333" + configuration.getProperties());
-	    //System.out.print("AFTER --> " + configuration.getProperty("hibernate.connection.url") + '\r');
-
 	    
 		serviceRegistry = new ServiceRegistryBuilder().applySettings(properties).buildServiceRegistry();          
 	    sessionFactory = configuration.buildSessionFactory(serviceRegistry);  
@@ -136,5 +141,42 @@ public class WebController {
 			}
 		}
 		return s;
+	}
+	
+	public String translationSaving(String word, String content, String direction)
+	{
+		// Configure the session factory
+		configureSessionFactory(direction);
+		
+		Session session = null;
+		Transaction tx = null;
+		
+		try {
+			session = sessionFactory.openSession();
+			s = "";
+			
+			tx = session.beginTransaction();
+
+			//Saving the data
+			Record record = new Record();
+			record.setWord(word);
+			record.setContent(content);
+			
+			//Integer myID = (Integer) session.save(record); //for testing
+			session.save(record);
+
+			session.getTransaction().commit();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			
+			// Rolling back the changes to make the data consistent in case of any failure 
+			// in between multiple database write operations.
+			tx.rollback();
+		} finally{
+			if(session != null) {
+				session.close();
+			}
+		}
+		return "";
 	}
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add translation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" />
+</head>
+<body>
+	<h1>Add translation</h1>
+	<div>
+		<form th:object="${record}" th:action="@{save}" action="#" method="post">
+		  	
+		  	<label for="word">Word</label>
+			<input type="text" id="word" th:field="*{word}" />
+			<div style="clear: both; display: block; height: 10px;"></div>
+		  	
+		  	<label for="content">Content</label>
+			<input type="text" id="content" th:field="*{content}" />
+			<div style="clear: both; display: block; height: 10px;"></div>
+			
+			<label for="directionlist">Direction</label>
+			<select id="directionlist" th:field="*{direction}" class="form-control">
+				<option th:each="direction: ${directions}" th:value="${direction}" th:text="${direction}"></option>
+			</select>
+			
+			<div style="clear: both; display: block; height: 10px;"></div>
+			<input class="btn btn-danger" type="submit" value="Save"></input>
+		</form>
+	</div>
+</body>
+</html>
