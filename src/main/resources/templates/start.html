@@ -3,9 +3,27 @@
 	<head>
     	<title>Translator</title>
     	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    	 <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" />
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" />
+		
+		<script type="text/JavaScript"
+		 src="/js/jquery-1.12.4.min.js">
+		</script>
+		
+		<script type="text/javascript" src="js/angular.min.js"></script>
+		<script type="text/javascript" src="js/ads.js"></script>
+		
 	</head>
-	<body>
+	<body ng-app="ads">
+	
+		<div class="container">
+			<div ng-controller="home">
+				<p>This ads is {{record.id}}.</p>
+				<p>{{record.content}}</p>
+			</div>
+  		</div>
+	
+		<div class="sb" id="test_x1" style="font-family: Arial Black; font-size: 12px; color: blue"></div>
+		<div class="sb" id="test_x2" style="font-family: Arial Black; font-size: 12px; color: blue"></div>
 		<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
         <form th:action="@{/logout}" method="post">
             <input type="submit" value="Sign Out" class="btn btn-danger"/>
@@ -35,18 +53,102 @@
 				</form>
 			</div>
 		</div>
-		<script type="text/javascript">		
+		<script type="text/javascript">
+		
+			function biuldWordList() {
+				var direction = $(document).find('input[name=direction]').val();
+
+				queue  = JSON.parse(localStorage.getItem(direction));
+				if (queue == null) queue = [];
+				//console.log(direction);
+				//console.log(queue);
+				document.getElementById("test_x1").innerHTML = JSON.stringify(queue);
+				
+			};
+			
+			$(document).ready(function() {
+				//console.log("ReCalling the same code 1");
+				biuldWordList();		
+			});		
+		
+			$('#myForm').submit(
+				function(ev) {
+				    ev.preventDefault(); // to stop the form from submitting
+
+
+		    
+				    this.submit(); // now perform the submition
+				    
+					jQuery(document).ready(
+							function($) {
+//-----------------
+								var record = {};
+								record.word = $(this).find('input[name=word]').val();
+								record.direction = $(this).find('input[name=direction]').val();
+								
+								//put max 5 translations to FIFO queue
+								queue  = JSON.parse(localStorage.getItem(record.direction));
+								if (queue == null) queue = []; 
+								
+								queue.push(record.word);
+								
+								if (queue.length > 5) {
+									queue.shift();
+								}
+								
+								localStorage.setItem(record.direction, JSON.stringify(queue));					    
+//-----------------	
+							}			
+						)
+				});
+		
+			
+			
+			
 			function changeX(el) {
-				console.log("--------------changing of the direction");
-			    if (el.value == "En-Fi") {
-			    	el.value = "Fi-En";
-			    	document.getElementById("direction").value = "Fi-En";
-			    }
-			    else {
-			    	el.value = "En-Fi";
-			    	document.getElementById("direction").value = "En-Fi";
-			    }
-			}
-		</script> 
+	
+				
+				jQuery(document).ready(
+					function($) {
+//console.log(el.value);
+//-----------------				
+						var record = {};
+						record.direction = $(this).find('input[name=direction]').val();
+						var nextState;
+						if (el.value == "En-Fi") {
+							nextState = "Fi-En";
+					    }
+					    else {
+					    	nextState = "En-Fi";
+					    }
+				
+						el.value = nextState;
+				    	document.getElementById("direction").value = nextState;
+				    	
+						$.ajax({
+							  contentType: 'application/json;charset=UTF-8',
+							  url: 'addRec',
+							  dataType: 'json',
+							  type: 'POST',
+							  cache: false, // Force requested pages not to be cached by the browser
+							  processData: false, // Avoid making query string instead of JSON
+							  data: JSON.stringify(record)
+							}).done(function (data) {
+								console.log('AJAX call was successfully executed');
+								console.log('data = ', data);
+								document.getElementById("test_x2").innerHTML = "AJAX (success) - direction was changed from \"" + data.direction + "\" to \"" + nextState + "\"";
+							}).fail(function () {
+								console.log('AJAX call failed');
+								document.getElementById("test_x2").innerHTML = "AJAX (fail)";
+						});
+						
+						//console.log("ReCalling the same code 2");
+						biuldWordList();
+//-----------------						    
+//console.log("--------------changing of the direction END");
+					}			
+				)
+			};
+		</script>
 	</body>
 </html>

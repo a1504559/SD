@@ -10,10 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    
-    @Override
+ 
+	@Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+        .csrf().disable() //without that setting is error 403 with AJAX 
         .authorizeRequests().antMatchers("/css/**").permitAll() // Enable css when logged out
         .and()
         .authorizeRequests()

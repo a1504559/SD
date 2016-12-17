@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class Application {
 /*
  http://localhost:8080/start
+ http://localhost:8080/rest?word=house
+ http://localhost:8080/rest?word=talo&direction=Fi-En
  */
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
